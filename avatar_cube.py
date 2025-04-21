@@ -145,7 +145,7 @@ def update_bluesky_avatar(now_utc: dt.datetime | None = None, dry_run=False):
 
 def sweep_through_images():
     INCREMENT = dt.timedelta(minutes=15)
-    timestamps = [START_DATETIME + i * INCREMENT for i in range(15)]
+    timestamps = [START_DATETIME + i * INCREMENT for i in range(13)]
     for ts in timestamps:
         update_bluesky_avatar(now_utc=ts, dry_run=True)
 
