@@ -112,11 +112,6 @@ def update_bluesky_avatar(now_utc: dt.datetime | None = None, dry_run=False):
         old_banner = current_profile.banner
         old_avatar = current_profile.avatar
 
-        print(old_avatar)
-        if old_avatar:
-            old_avatar_ref = old_avatar.ref
-            print(old_avatar_ref)
-            
     except BadRequestError:
         current_profile = swap_record_cid = None
 
