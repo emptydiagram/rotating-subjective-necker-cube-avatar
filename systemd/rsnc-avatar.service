@@ -1,0 +1,5 @@
+[Unit]
+Description=Run avatar update
+
+WorkingDirectory=/path/to/rotating-subjective-necker-cube-avatar
+ExecStart=/path/to/uv run avatar_cube.py

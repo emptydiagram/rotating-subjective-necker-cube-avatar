@@ -1,0 +1,9 @@
+[Unit]
+Description=Run avatar update every 15 minutes starting at :01
+
+[Timer]
+OnCalendar=*:01,16,31,46
+Persistent=true
+
+[Install]
+WantedBy=timers.target
