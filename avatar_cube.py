@@ -8,11 +8,11 @@ from atproto import Client, models
 
 # ─────────────────────────── configuration ───────────────────────────────
 START_DATETIME = dt.datetime(2025, 4, 21, 0, 0, 0, tzinfo=dt.timezone.utc)
-ZOOM           = 100.0   # px per 2 cube units (smaller than interactive ver.)
-CIRCLE_R       = 17      # px
-LINE_W         = 6      # px
-PITCH_DEG       = 20       # fixed roll
-YAW_DEG        = 45      # fixed yaw
+ZOOM           = 100.0
+CIRCLE_R       = 17
+LINE_W         = 6
+PITCH_DEG      = 20
+YAW_DEG        = 45
 
 # ─────────────────────────── math helpers ────────────────────────────────
 
