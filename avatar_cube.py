@@ -11,10 +11,6 @@ START_DATETIME = dt.datetime(2025, 4, 21, 0, 0, 0, tzinfo=dt.timezone.utc)
 ZOOM           = 100.0
 CIRCLE_R       = 17
 LINE_W         = 6
-PITCH_DEG      = 20
-YAW_DEG        = 45
-
-# ─────────────────────────── math helpers ────────────────────────────────
 
 def rot_xyz(roll: float, pitch: float, yaw: float) -> np.ndarray:
     """Build 3×3 rotation matrix for intrinsic X‑(roll), Y‑(pitch), Z‑(yaw)."""
@@ -40,9 +36,7 @@ EDGES = [(0, 1), (1, 2), (2, 3), (3, 0),
 CUBE_RADIUS_PX = math.sqrt(3) * (ZOOM / 2)
 HALF_FRAME     = CUBE_RADIUS_PX + CIRCLE_R + 5
 
-# ─────────────────────────── rendering core ──────────────────────────────
-
-def render_frame(roll_deg: float) -> bytes:
+def render_frame(roll_deg: float, pitch_deg: float, yaw_deg: float) -> bytes:
     """Return PNG bytes of cube at given pitch (deg)."""
     # Matplotlib figure — square, no border
     fig = plt.figure(figsize=(2, 2), dpi=256, facecolor="white")
@@ -51,7 +45,7 @@ def render_frame(roll_deg: float) -> bytes:
     ax.axis('off')
 
     # rotate & project
-    R        = rot_xyz(math.radians(roll_deg), math.radians(PITCH_DEG), math.radians(YAW_DEG))
+    R        = rot_xyz(math.radians(roll_deg), math.radians(pitch_deg), math.radians(yaw_deg))
     verts2d  = project_ortho(V @ R.T)
 
     # draw circles
@@ -74,27 +68,22 @@ def render_frame(roll_deg: float) -> bytes:
     plt.close(fig)
     return buf.getvalue()
 
-# ─────────────────────────── avatar update logic ─────────────────────────
-
-def compute_deg(now_utc: dt.datetime | None = None) -> int:
-    now = now_utc or dt.datetime.now(dt.timezone.utc)
-    elapsed_min = int((now - START_DATETIME).total_seconds() // 60)
-    steps       = elapsed_min // 15           # integer 15‑min buckets
-    deg   = (steps * 7) % 360           # wrap at 360
-    return deg
-
-
 def update_bluesky_avatar(now_utc: dt.datetime | None = None, dry_run=False):
     handle   = os.getenv('BLUESKY_HANDLE')
     app_pw   = os.getenv('BLUESKY_APP_PASSWORD')
     if not handle or not app_pw:
         raise RuntimeError('BLUESKY_HANDLE and BLUESKY_APP_PASSWORD must be set')
 
-    roll = compute_deg(now_utc)
-    png = render_frame(roll)
+    now = now_utc or dt.datetime.now(dt.timezone.utc)
+    elapsed_min = int((now - START_DATETIME).total_seconds() // 60)
+    steps       = elapsed_min // 15 # integer 15‑min buckets
+    deg_roll   = (steps * 7) % 360  # wrap at 360
+    deg_pitch = (steps * 3) % 360
+    deg_yaw = (steps * 5) % 360
+    png = render_frame(deg_roll, deg_pitch, deg_yaw)
 
     if dry_run:
-        with open(f'cube-{roll}.png', 'wb') as f:
+        with open(f'cube-{steps}.png', 'wb') as f:
             f.write(png)
         return
 
@@ -140,7 +129,7 @@ def update_bluesky_avatar(now_utc: dt.datetime | None = None, dry_run=False):
 
 def sweep_through_images():
     INCREMENT = dt.timedelta(minutes=15)
-    timestamps = [START_DATETIME + i * INCREMENT for i in range(13)]
+    timestamps = [START_DATETIME + i * INCREMENT for i in range(104)]
     for ts in timestamps:
         update_bluesky_avatar(now_utc=ts, dry_run=True)
 
