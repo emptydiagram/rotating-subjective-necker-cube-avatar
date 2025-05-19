@@ -124,7 +124,7 @@ def update_bluesky_avatar(now_utc: dt.datetime | None = None, dry_run=False):
     )
 
 
-    print(f"updated avatar → roll={roll}° (elapsed {((dt.datetime.now(dt.timezone.utc)-START_DATETIME).total_seconds()//60)} min)")
+    print(f"updated avatar → degrees={(deg_roll, deg_pitch, deg_yaw)}° (elapsed {((dt.datetime.now(dt.timezone.utc)-START_DATETIME).total_seconds()//60)} min)")
 
 
 def sweep_through_images():
