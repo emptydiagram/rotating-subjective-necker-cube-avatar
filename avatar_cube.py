@@ -9,7 +9,7 @@ from atproto import Client, models
 # ─────────────────────────── configuration ───────────────────────────────
 START_DATETIME = dt.datetime(2025, 4, 21, 0, 0, 0, tzinfo=dt.timezone.utc)
 ZOOM           = 100.0
-CIRCLE_R       = 17
+CIRCLE_R       = 23
 LINE_W         = 6
 
 def rot_xyz(roll: float, pitch: float, yaw: float) -> np.ndarray:
@@ -129,7 +129,7 @@ def update_bluesky_avatar(now_utc: dt.datetime | None = None, dry_run=False):
 
 def sweep_through_images():
     INCREMENT = dt.timedelta(minutes=15)
-    timestamps = [START_DATETIME + i * INCREMENT for i in range(104)]
+    timestamps = [START_DATETIME + i * INCREMENT for i in range(180)]
     for ts in timestamps:
         update_bluesky_avatar(now_utc=ts, dry_run=True)
 
