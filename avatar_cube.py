@@ -83,7 +83,7 @@ def update_bluesky_avatar(now_utc: dt.datetime | None = None, dry_run=False):
     png = render_frame(deg_roll, deg_pitch, deg_yaw)
 
     if dry_run:
-        with open(f'cube-{steps}.png', 'wb') as f:
+        with open(f'cube-{steps:03d}.png', 'wb') as f:
             f.write(png)
         return
 
