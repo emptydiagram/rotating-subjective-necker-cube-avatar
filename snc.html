@@ -1,0 +1,104 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Subjective Necker Cube</title>
+<style>
+  html,body{
+    margin:0;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#fff;       /* white background */
+  }
+</style>
+</head>
+<body>
+<canvas id="cube" width="512" height="512"></canvas>
+
+<script>
+(() => {
+  const canvas      = document.getElementById('cube');
+  const ctx         = canvas.getContext('2d');
+  const W           = canvas.width;
+  const H           = canvas.height;
+  const CX          = W / 2;
+  const CY          = H / 2;
+
+  const SCALE       = 80;
+  const DISK_RADIUS = 24;
+  const EDGE_THICK  = 12;
+
+  const VERTS = [                   // corner coordinates of unit cube
+    [-1,-1,-1],[ 1,-1,-1],[ 1, 1,-1],[-1, 1,-1],
+    [-1,-1, 1],[ 1,-1, 1],[ 1, 1, 1],[-1, 1, 1],
+  ];
+  const EDGES = [                   // pairs of vertex indices
+    [0,1],[1,2],[2,3],[3,0],
+    [4,5],[5,6],[6,7],[7,4],
+    [0,4],[1,5],[2,6],[3,7],
+  ];
+
+  function rotate([x0,y0,z0], yaw, pitch, roll){
+    // yaw (y axis)
+    let x =  x0*Math.cos(yaw) + z0*Math.sin(yaw);
+    let z = -x0*Math.sin(yaw) + z0*Math.cos(yaw);
+    let y =  y0;
+
+    // pitch (x axis)
+    [y,z] = [y*Math.cos(pitch) - z*Math.sin(pitch),
+             y*Math.sin(pitch) + z*Math.cos(pitch)];
+
+    // roll (z axis)
+    [x,y] = [x*Math.cos(roll) - y*Math.sin(roll),
+             x*Math.sin(roll) + y*Math.cos(roll)];
+    return [x,y,z];
+  }
+
+  function project([x,y,z]) {        // z is ignored
+    return [CX + x*SCALE, CY - y*SCALE];
+  }
+
+  /* ---------- main draw loop ---------- */
+  function draw(tMillis){
+    const t   = tMillis * 0.001;          // seconds
+    const yaw   = 0.5*0.7 * t;
+    const pitch = 0.5*0.3 * t;
+    const roll  = 0.5*0.5 * t;
+
+    // clear
+    ctx.clearRect(0,0,W,H);
+
+    // project all vertices for this frame
+    const screen = VERTS.map(v => project(rotate(v, yaw, pitch, roll)));
+
+    /* draw black vertex disks first */
+    ctx.fillStyle = '#000';
+    screen.forEach(([x,y])=>{
+      ctx.beginPath();
+      ctx.arc(x, y, DISK_RADIUS, 0, Math.PI*2);
+      ctx.fill();
+    });
+
+    /* draw thick white edges on top */
+    ctx.lineWidth   = EDGE_THICK;
+    ctx.strokeStyle = '#fff';             // same as background
+    ctx.lineCap     = 'round';
+    ctx.beginPath();
+    EDGES.forEach(([i,j])=>{
+      const [x1,y1] = screen[i];
+      const [x2,y2] = screen[j];
+      ctx.moveTo(x1,y1);
+      ctx.lineTo(x2,y2);
+    });
+    ctx.stroke();
+
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
